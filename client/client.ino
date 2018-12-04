@@ -140,7 +140,5 @@ void loop()
     {
         connectToMqtt();
     }
-    Serial.println("Running client loop");
     client.loop();
-    delay(100);
 }
