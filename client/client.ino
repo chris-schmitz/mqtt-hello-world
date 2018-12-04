@@ -143,46 +143,4 @@ void loop()
     Serial.println("Running client loop");
     client.loop();
     delay(100);
-
-    /*
-    delay(5000);
-    ++value;
-
-    if (PRINT_OUTPUT)
-    {
-        Serial.print("connecting to: ");
-        Serial.println(SERVER_HOST);
-    }
-
-    WiFiClient client;
-    const int httpPort = 3000;
-
-    if (!client.connect(SERVER_HOST, httpPort))
-    {
-        Serial.println("connection failed");
-        return;
-    }
-
-    String url = "/";
-    if (PRINT_OUTPUT)
-    {
-        Serial.print("Requesting url: ");
-        Serial.println(url);
-    }
-
-    client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-                 "Host: " + SERVER_HOST + "\r\n" +
-                 "Connection: close\r\n\r\n");
-
-    delay(500);
-
-    while (client.available())
-    {
-        String line = client.readStringUntil('\r');
-        Serial.print(line);
-    }
-
-    Serial.println();
-    Serial.println("closing connection");
-    */
 }

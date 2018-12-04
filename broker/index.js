@@ -18,52 +18,33 @@ server.on('ready', setup)
 
 function setup() {
     console.log("Mosca server is up and running")
-
-    // const testMessage = {
-    //     topic: '/hello/world',
-    //     payload: 'hey there',
-    //     qos: 0,
-    //     retain: false
-    // }
-
-    // server.publish(testMessage, () => {
-    //     console.log('done')
-    // })
-
-    server.on('published', (packet, client) => {
-        console.log("published a message:")
-        console.log("published", packet)
-        console.log("client", client)
-    })
-
-    server.on('clientConnected', client => {
-        console.log("client connected:", client.id)
-
-        const ledBlinkMessage = {
-            topic: '/blink/led',
-            payload: 'blink that led!',
-            qos: 0,
-            retain: false
-        }
-        server.publish(ledBlinkMessage, () => {
-            console.log("Published LED blink message. Cross your fingers!")
-        })
-    })
-
-    server.on('clientDisconnected', client => {
-        console.log("client disconnected", client.id)
-    })
+    server.on('published', logPublishingOfAMessage)
+    server.on('clientConnected', handleClientConnection)
+    server.on('clientDisconnected', handleClientDisconnect)
 }
 
-/*
-const express = require('express')
-const app = express()
-const port = 3000
-const path = require('path')
+function handleClientConnection(client) {
+    console.log("client connected:", client.id)
 
-app.use(express.static(path.join(__dirname, 'public')))
+    const ledBlinkMessage = {
+        topic: '/blink/led',
+        payload: 'blink that led!',
+        qos: 0,
+        retain: false
+    }
+    server.publish(ledBlinkMessage, () => {
+        console.log("Published LED blink message. Cross your fingers!")
+    })
 
-app.get('/', (req, res) => res.send('Hello World!'))
+}
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
-*/
+function handleClientDisconnect(client) {
+    console.log("client disconnected", client.id)
+}
+
+function logPublishingOfAMessage(packet, client) {
+    console.log("published a message:")
+    console.log("published", packet)
+    console.log("client", client)
+
+}
