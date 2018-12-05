@@ -20,19 +20,11 @@ void blinkLED()
 {
     Serial.println("blink led function fired");
     digitalWrite(LED_PIN, HIGH);
-    delay(300);
+    delay(900);
     digitalWrite(LED_PIN, LOW);
     delay(300);
     digitalWrite(LED_PIN, HIGH);
-    delay(300);
-    digitalWrite(LED_PIN, LOW);
-    delay(300);
-    digitalWrite(LED_PIN, HIGH);
-    delay(300);
-    digitalWrite(LED_PIN, LOW);
-    delay(300);
-    digitalWrite(LED_PIN, HIGH);
-    delay(300);
+    delay(900);
     digitalWrite(LED_PIN, LOW);
     delay(300);
 }
@@ -116,14 +108,7 @@ void setup()
     Serial.begin(115200);
     pinMode(LED_PIN, OUTPUT);
 
-    digitalWrite(LED_PIN, HIGH);
-    delay(100);
     digitalWrite(LED_PIN, LOW);
-    delay(100);
-    digitalWrite(LED_PIN, HIGH);
-    delay(100);
-    digitalWrite(LED_PIN, LOW);
-    delay(100);
 
     delay(100);
     connectToWifi();

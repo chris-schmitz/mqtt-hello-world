@@ -26,15 +26,7 @@ function setup() {
 function handleClientConnection(client) {
     console.log("client connected:", client.id)
 
-    const ledBlinkMessage = {
-        topic: '/blink/led',
-        payload: 'blink that led!',
-        qos: 0,
-        retain: false
-    }
-    server.publish(ledBlinkMessage, () => {
-        console.log("Published LED blink message. Cross your fingers!")
-    })
+    spamClient()
 
 }
 
@@ -46,5 +38,23 @@ function logPublishingOfAMessage(packet, client) {
     console.log("published a message:")
     console.log("published", packet)
     console.log("client", client)
+
+}
+
+function spamClient() {
+    setInterval(sendLedBlinkMessage, 5000)
+}
+
+function sendLedBlinkMessage() {
+    console.log('sending blink message')
+    const ledBlinkMessage = {
+        topic: '/blink/led',
+        payload: 'blink that led!',
+        qos: 0,
+        retain: false
+    }
+    server.publish(ledBlinkMessage, () => {
+        console.log("Published LED blink message. Cross your fingers!")
+    })
 
 }
