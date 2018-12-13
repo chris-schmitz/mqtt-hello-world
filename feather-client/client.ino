@@ -1,3 +1,10 @@
+/*
+ * This client is heavily cribbed from Keith Chester's Garden Relay client:
+ *
+ * https://github.com/hlfshell/garden-relay
+ *
+*/
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
