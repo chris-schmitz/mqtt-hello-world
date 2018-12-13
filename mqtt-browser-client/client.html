@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <script src="https://unpkg.com/mqtt@2.18.8/dist/mqtt.min.js"></script>
+    </head>
+    <body>
+        <h1>hi</h1>
+        <button id="greetings-button">Say hi to feather</button>
+        <script>
+            var client = mqtt.connect("http://localhost:3000")
+
+            client.on("connect", () => {
+                console.log("connected to mqtt server")
+                document
+                    .getElementById("greetings-button")
+                    .addEventListener("click", () => {
+                        client.publish(
+                            "/relayto/feather",
+                            "hi from the browser"
+                        )
+                    })
+            })
+
+            client.subscribe("mqtt/demo")
+
+            client.on("message", function(topic, payload) {
+                console.log([topic, payload].join(": "))
+            })
+
+            client.publish("mqtt/demo", "hello world!")
+        </script>
+    </body>
+</html>

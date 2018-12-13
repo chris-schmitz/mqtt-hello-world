@@ -7,7 +7,9 @@
 #define PRINT_OUTPUT true
 
 // * mqtt subscriptions
+const char *demoTopic = "/mqtt/demo";
 const char *testSubscriptionTopic = "/blink/led";
+const char *messageFromBroker = "/message";
 
 // * hardware pin defs
 #define LED_PIN 0
@@ -27,6 +29,11 @@ void blinkLED()
     delay(900);
     digitalWrite(LED_PIN, LOW);
     delay(300);
+}
+
+void sayHi()
+{
+    Serial.println("Oh hey!!");
 }
 
 void connectToWifi()
@@ -64,6 +71,8 @@ void connectToMqtt()
         {
             Serial.println("Connected to MQTT :D");
             client.subscribe(testSubscriptionTopic);
+            client.subscribe(demoTopic);
+            client.subscribe(messageFromBroker);
         }
         else
         {
@@ -99,6 +108,20 @@ void handleMQTTMessage(char *topic, byte *payload, unsigned int length)
     if (strcmp(topic, testSubscriptionTopic) == 0)
     {
         // * parse payload if you need to
+        blinkLED();
+    }
+
+    if (strcmp(topic, demoTopic) == 0)
+    {
+        Serial.println("Got the demo message");
+        // * parse payload if you need to
+        sayHi();
+    }
+
+    if (strcmp(topic, messageFromBroker) == 0)
+    {
+        Serial.println("Got a message from the broker!!!");
+        Serial.println(command);
         blinkLED();
     }
 }
