@@ -40,7 +40,7 @@ function relayToClient(client) {
     console.log("relaying to feather!")
     const message = {
         topic: "/message",
-        paylaod: `hi from client: ${client.id}`,
+        payload: `hi from client: ${client.id}`,
         qos: 2,
         retain: true
     }
