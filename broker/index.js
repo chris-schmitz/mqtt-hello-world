@@ -1,11 +1,8 @@
-var mosca = require("mosca")
-var server = new mosca.Server({
-    http: {
-        port: 3000,
-        bundle: true,
-        static: "./"
-    }
-})
+const brokerSetup = require('./server-setups/setupBroker')
+const socketioSetup = require('./server-setups/setupSocketio')
+
+const io = socketioSetup()
+const server = brokerSetup()
 
 server.on("ready", setup)
 
@@ -33,6 +30,7 @@ function handlePublishedMessage(packet, client) {
 
     if (packet.topic === "/relayto/feather") {
         relayToClient(client)
+        io.emit('relay', packet)
     }
 }
 
