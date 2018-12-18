@@ -35,6 +35,9 @@ const mutations = {
     },
     setSocketioClient(state, value) {
         state.socketioClient = value
+    },
+    setServerResponse(state, value) {
+        state.serverResponse = value
     }
 }
 
@@ -44,6 +47,7 @@ const actions = {
             console.log("Cannot initialize socket io yet.")
             console.log("We don't have all of the configurations:")
             console.log({host: state.host, port: state.port})
+            return
         }
 
         const url = `http://${state.host}:${state.port}`
@@ -61,7 +65,7 @@ const actions = {
             const stamped = moment().format('hh:mm:ss') + ": " + data
             const newResponse = state.serverResponse + "\n" + stamped
             console.log(newResponse)
-            state.serverResponse = newResponse
+            commit('setServerResponse', newResponse)
         })
 
         commit("setSocketioClient", client)
