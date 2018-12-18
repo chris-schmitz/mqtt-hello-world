@@ -1,5 +1,6 @@
 import Vue from "nativescript-vue"
 import Vuex from "vuex"
+import moment from 'moment'
 
 import io from "socket.io-client/dist/socket.io.js"
 
@@ -57,8 +58,10 @@ const actions = {
         })
 
         client.on("response", data => {
-            console.log(data)
-            state.serverResponse = data
+            const stamped = moment().format('hh:mm:ss') + ": " + data
+            const newResponse = state.serverResponse + "\n" + stamped
+            console.log(newResponse)
+            state.serverResponse = newResponse
         })
 
         commit("setSocketioClient", client)

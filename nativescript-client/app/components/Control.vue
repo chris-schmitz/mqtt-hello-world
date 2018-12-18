@@ -4,7 +4,7 @@
         <Button v-if="socketConfigurationNeeded" class="button config-needed" text="Config Needed" @tap="goToSeettingsTab" col="0" row="1"/>
         <Button v-if="!socketConfigurationNeeded" class="button" text="Send Greetings" @tap="sendGreetings" col="0" row="1"/>
         <Label class="label" text="Response:" col="0" row="2"/>
-        <Label class="output" :text="response" col="0" row="3" colSpan="2"/>
+        <TextView class="output" :text="response" editable="false" col="0" row="3" colSpan="2"/>
     </GridLayout>
 </template>
 
