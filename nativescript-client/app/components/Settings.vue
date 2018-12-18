@@ -1,5 +1,5 @@
 <template>
-    <GridLayout columns="*" rows="75,auto,auto,auto,auto,auto,auto">
+    <GridLayout columns="*" rows="75,auto,auto,auto,auto,auto,auto,auto,auto">
 
         <Label class="heading" text="Settings" col="0" row="0"/>
         <Button class="button" :class="stateClass" :text="buttonText" @tap="handleButtonClick" row="1" />
@@ -8,11 +8,14 @@
         <Label class="label" text="Websocket Port:" col="0" row="4" />
         <TextField class="field" :class="stateClass" :editable="!locked" v-model="port" hint="xxxx" row="5"/>
 
+        <Label class="label" text="Socket Client State:" col="0" row="6" />
+        <Label class="field" :text="socketioClientState" col="0" row="7" />
+
     </GridLayout>
 </template>
 
 <script>
-    import {mapState, mapMutations} from 'vuex'
+    import {mapState, mapMutations, mapGetters, mapActions} from 'vuex'
     export default {
         data () {
             return {
@@ -21,6 +24,7 @@
         },
         computed: {
             ...mapState({sharedHost: 'host', sharedPort: 'port'}),
+            ...mapGetters(['fullServerAddress', 'socketioClientState']),
             host: {
                 get() {
                     return this.sharedHost
@@ -44,10 +48,15 @@
             buttonText() {
                 return this.locked ? "Edit" : "Save"
             },
+
         },
         methods: {
             ...mapMutations(['setHost', 'setPort']),
+            ...mapActions(['initalizeSocketioClient']),
             handleButtonClick() {
+                if (!this.locked && this.fullServerAddress) {
+                    this.initalizeSocketioClient()
+                }
                 this.locked = !this.locked
             }
         },

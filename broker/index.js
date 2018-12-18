@@ -4,7 +4,32 @@ const socketioSetup = require('./server-setups/setupSocketio')
 const io = socketioSetup()
 const server = brokerSetup()
 
+// * ============================================== * //
+// * Socket.io connections for nativescript app
+
+io.on("connection", function(socket) {
+    console.log('got a connection')
+    console.log("a user connected")
+
+    io.emit("test", "Connected to socket server.")
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected')
+    })
+
+    socket.on('blink-led', () => {
+        console.log('sending blink')
+        sendLedBlinkMessage()
+        io.to(socket.id).emit('response', 'blink sent to feather')
+    })
+})
+// * ============================================== * //
+
+
+// ? ============================================== ? //
+// ? MQTT connections for everything else
 server.on("ready", setup)
+
 
 function setup() {
     console.log("server running")
@@ -78,3 +103,4 @@ function sendLedBlinkMessage() {
         console.log("Published LED blink message. Cross your fingers!")
     })
 }
+// ? ============================================== ? //

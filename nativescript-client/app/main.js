@@ -1,11 +1,10 @@
 import App from './components/App'
 import VueDevtools from 'nativescript-vue-devtools'
 import Vue from 'nativescript-vue'
-
 import store from './store/index'
 
 if(TNS_ENV !== 'production') {
-  Vue.use(VueDevtools, {host: '192.168.1.8'})
+  Vue.use(VueDevtools, {host: '10.10.11.185'})
 }
 // Prints Vue logs when --env.production is *NOT* set while building
 Vue.config.silent = (TNS_ENV === 'production')

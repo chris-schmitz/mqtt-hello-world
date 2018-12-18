@@ -1,44 +1,45 @@
 <template>
     <GridLayout columns="*" rows="50,50,50,*">
         <Label class="label" text="Say hello:" col="0" row="0"/>
-        <Button class="button" text="Send Greetings" @tap="sendGreetings" col="0" row="1"/>
+        <Button v-if="socketConfigurationNeeded" class="button config-needed" text="Config Needed" @tap="goToSeettingsTab" col="0" row="1"/>
+        <Button v-if="!socketConfigurationNeeded" class="button" text="Send Greetings" @tap="sendGreetings" col="0" row="1"/>
         <Label class="label" text="Response:" col="0" row="2"/>
         <Label class="output" :text="response" col="0" row="3" colSpan="2"/>
     </GridLayout>
 </template>
 
 <script>
-    import {mapState} from 'vuex'
-    import io from 'socket.io-client/dist/socket.io.js'
-
+    import {mapState, mapGetters, mapMutations} from 'vuex'
+    import {SOCKET_CLIENT_STATES} from '../store/index'
 
     export default {
         data () {
             return {
-                client:null,
-                response: null
             }
         },
         computed: {
-            ...mapState(['host', 'port'])
-        },
-        methods: {
-            sendGreetings () {
-
+            ...mapState({storedActiveTabIndex: 'activeTabIndex', response: 'serverResponse',client: 'socketioClient'}),
+            ...mapGetters(['socketioClientState']),
+            activeTabIndex: {
+                get() {
+                    return this.storedActiveTabIndex
+                },
+                set(index) {
+                    this.setActiveTabIndex(index)
+                }
+            },
+            socketConfigurationNeeded() {
+                return this.socketioClientState === SOCKET_CLIENT_STATES.UNCONFIGURED ? true : false
             }
         },
-        created() {
-            this.client = io('http://192.168.1.8:3001')
-
-            this.client.on('connect', () => {
-                })
-            this.client.on('test', (data) => {
-                // this.response = JSON.stringify(data)
-            })
-
-            this.client.on('relay', (data) => {
-                this.response = JSON.stringify(data)
-            })
+        methods: {
+            ...mapMutations(['setActiveTabIndex']),
+            sendGreetings () {
+                this.client.emit('blink-led')
+            },
+            goToSeettingsTab() {
+                this.setActiveTabIndex(1)
+            }
         }
     }
 </script>
@@ -48,6 +49,11 @@
 
 .button {
   width: 500px;
+  background-color: $green;
+
+    &.config-needed {
+        background-color: $gray;
+    }
 }
 
 .label {

@@ -6,7 +6,8 @@
       android:tabTextColor="#c4ffdf"
       android:selectedTabTextColor="#ffffff"
       androidSelectedTabHighlightColor="#ffffff"
-      selectedIndex="0"
+      :selectedIndex="activeTabIndex"
+      @selectedIndexChange="handleTabChange"
     >
       <TabViewItem title="Control">
         <Control/>
@@ -21,6 +22,8 @@
 <script>
 import Control from './Control'
 import Settings from './Settings'
+import {mapState,mapMutations, mapGetters, mapActions} from 'vuex'
+import {SOCKET_CLIENT_STATES} from '../store/index'
 
 export default {
   components: {
@@ -29,8 +32,23 @@ export default {
   },
   data() {
     return {
-      response: 'test'
-    };
+    }
+  },
+  computed: {
+    ...mapState(['activeTabIndex']),
+    ...mapGetters(['socketioClientState'])
+  },
+  methods: {
+    ...mapMutations(['setActiveTabIndex']),
+    ...mapActions(['initalizeSocketioClient']),
+    handleTabChange(newIndex) {
+      this.setActiveTabIndex(newIndex)
+    }
+  },
+  created() {
+    if (this.socketioClientState === SOCKET_CLIENT_STATES.CONFIGURED) {
+      this.initalizeSocketioClient()
+    }
   }
 };
 </script>
