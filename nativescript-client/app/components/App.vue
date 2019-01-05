@@ -15,39 +15,43 @@
       <TabViewItem title="Settings">
         <Settings/>
       </TabViewItem>
+      <TabViewItem title="Picker">
+        <Picker/>
+      </TabViewItem>
     </TabView>
   </Page>
 </template>
 
 <script>
-import Control from './Control'
-import Settings from './Settings'
-import {mapState,mapMutations, mapGetters, mapActions} from 'vuex'
-import {SOCKET_CLIENT_STATES} from '../store/index'
+import Control from "./Control";
+import Settings from "./Settings";
+import Picker from "./Picker";
+import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
+import { SOCKET_CLIENT_STATES } from "../store/index";
 
 export default {
   components: {
     Control,
-    Settings
+    Settings,
+    Picker
   },
   data() {
-    return {
-    }
+    return {};
   },
   computed: {
-    ...mapState(['activeTabIndex']),
-    ...mapGetters(['socketioClientState'])
+    ...mapState(["activeTabIndex"]),
+    ...mapGetters(["socketioClientState"])
   },
   methods: {
-    ...mapMutations(['setActiveTabIndex']),
-    ...mapActions(['initalizeSocketioClient']),
+    ...mapMutations(["setActiveTabIndex"]),
+    ...mapActions(["initalizeSocketioClient"]),
     handleTabChange(newIndex) {
-      this.setActiveTabIndex(newIndex)
+      this.setActiveTabIndex(newIndex);
     }
   },
   created() {
     if (this.socketioClientState === SOCKET_CLIENT_STATES.CONFIGURED) {
-      this.initalizeSocketioClient()
+      this.initalizeSocketioClient();
     }
   }
 };
@@ -60,5 +64,4 @@ ActionBar {
   background-color: $green;
   color: $white;
 }
-
 </style>
