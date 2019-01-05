@@ -10,6 +10,7 @@
 
 // * Wifi creds and server information
 #include "credentials.h"
+#include "enumdefs.h"
 
 #define PRINT_OUTPUT true
 
@@ -20,6 +21,10 @@ const char *messageFromBroker = "/message";
 
 // * hardware pin defs
 #define LED_PIN 0
+
+#define RGB_R 14
+#define RGB_G 12
+#define RGB_B 13
 
 // * getting classy
 WiFiClient wifi;
@@ -145,15 +150,71 @@ void setup()
     client.setServer(SERVER_HOST, MQTT_PORT);
     Serial.println("created client server. setting callback");
     client.setCallback(handleMQTTMessage);
+
+    // * RGB LED
+    pinMode(RGB_R, OUTPUT);
+    pinMode(RGB_G, OUTPUT);
+    pinMode(RGB_B, OUTPUT);
+    digitalWrite(RGB_R, HIGH);
+    digitalWrite(RGB_G, HIGH);
+    digitalWrite(RGB_B, HIGH);
 }
 
 int value = 0;
 
 void loop()
 {
-    if (!client.connected())
+    // setRGBLED(255, 255, 255);
+    // delay(2000);
+    setRGBLED(red);
+    delay(2000);
+    setRGBLED(green);
+    delay(2000);
+    setRGBLED(blue);
+    delay(2000);
+    setRGBLED();
+    delay(2000);
+    return;
+
+    // if (!client.connected())
+    // {
+    //     connectToMqtt();
+    // }
+    // client.loop();
+}
+
+void setRGBLED(Color color)
+{
+    switch (color)
     {
-        connectToMqtt();
+    case red:
+        digitalWrite(RGB_R, LOW);
+        digitalWrite(RGB_G, HIGH);
+        digitalWrite(RGB_B, HIGH);
+        break;
+    case green:
+        digitalWrite(RGB_R, HIGH);
+        digitalWrite(RGB_G, LOW);
+        digitalWrite(RGB_B, HIGH);
+        break;
+    case blue:
+        digitalWrite(RGB_R, HIGH);
+        digitalWrite(RGB_G, HIGH);
+        digitalWrite(RGB_B, LOW);
+        break;
     }
-    client.loop();
+}
+
+void setRGBLED(uint8_t r, uint8_t g, uint8_t b)
+{
+    digitalWrite(RGB_R, LOW);
+    digitalWrite(RGB_G, LOW);
+    digitalWrite(RGB_B, LOW);
+}
+
+void setRGBLED()
+{
+    digitalWrite(RGB_R, HIGH);
+    digitalWrite(RGB_G, HIGH);
+    digitalWrite(RGB_B, HIGH);
 }
