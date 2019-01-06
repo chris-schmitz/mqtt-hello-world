@@ -1,5 +1,5 @@
-const brokerSetup = require('./server-setups/setupBroker')
-const socketioSetup = require('./server-setups/setupSocketio')
+const brokerSetup = require("./server-setups/setupBroker")
+const socketioSetup = require("./server-setups/setupSocketio")
 
 const io = socketioSetup()
 const server = brokerSetup()
@@ -8,28 +8,32 @@ const server = brokerSetup()
 // * Socket.io connections for nativescript app
 
 io.on("connection", function(socket) {
-    console.log('got a connection')
+    console.log("got a connection")
     console.log("a user connected")
 
     io.emit("test", "Connected to socket server.")
 
-    socket.on('disconnect', () => {
-        console.log('user disconnected')
+    socket.on("disconnect", () => {
+        console.log("user disconnected")
     })
 
-    socket.on('blink-led', () => {
-        console.log('sending blink')
+    socket.on("blink-led", () => {
+        console.log("sending blink")
         sendLedBlinkMessage()
-        io.to(socket.id).emit('response', 'blink sent to feather')
+        io.to(socket.id).emit("response", "blink sent to feather")
+    })
+
+    socket.on("set-strip-color", data => {
+        console.log("setting strip color:")
+        console.log(data.color)
+        setStripColor(data.color)
     })
 })
 // * ============================================== * //
 
-
 // ? ============================================== ? //
 // ? MQTT connections for everything else
 server.on("ready", setup)
-
 
 function setup() {
     console.log("server running")
@@ -55,7 +59,7 @@ function handlePublishedMessage(packet, client) {
 
     if (packet.topic === "/relayto/feather") {
         relayToClient(client)
-        io.emit('relay', packet)
+        io.emit("relay", packet)
     }
 }
 
@@ -101,6 +105,19 @@ function sendLedBlinkMessage() {
     }
     server.publish(ledBlinkMessage, () => {
         console.log("Published LED blink message. Cross your fingers!")
+    })
+}
+
+function setStripColor(color) {
+    const message = {
+        topic: "/strip/setcolor/rgb",
+        payload: `${color.r},${color.g},${color.b}\n`,
+        qos: 0,
+        retain: true
+    }
+
+    server.publish(message, () => {
+        console.log("publishing set strip color message")
     })
 }
 // ? ============================================== ? //

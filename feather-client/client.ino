@@ -7,6 +7,7 @@
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <Adafruit_NeoPixel.h>
 
 // * Wifi creds and server information
 #include "credentials.h"
@@ -18,17 +19,18 @@
 const char *demoTopic = "/mqtt/demo";
 const char *testSubscriptionTopic = "/blink/led";
 const char *messageFromBroker = "/message";
+const char *stripColor = "/strip/setcolor/rgb";
 
 // * hardware pin defs
 #define LED_PIN 0
 
-#define RGB_R 14
-#define RGB_G 12
-#define RGB_B 13
+#define LED_STRIP_PIN 14
+#define TOTAL_PIXELS 8
 
 // * getting classy
 WiFiClient wifi;
 PubSubClient client(wifi);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(TOTAL_PIXELS, LED_STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
 void blinkLED()
 {
@@ -85,6 +87,7 @@ void connectToMqtt()
             client.subscribe(testSubscriptionTopic);
             client.subscribe(demoTopic);
             client.subscribe(messageFromBroker);
+            client.subscribe(stripColor);
         }
         else
         {
@@ -136,6 +139,42 @@ void handleMQTTMessage(char *topic, byte *payload, unsigned int length)
         Serial.println(command);
         blinkLED();
     }
+
+    if (strcmp(topic, stripColor) == 0)
+    {
+        Serial.println("got set strip color message");
+
+        char *strtokIndex;
+        uint8_t r, g, b;
+
+        strtokIndex = strtok(command, ",");
+        r = atoi(strtokIndex);
+
+        strtokIndex = strtok(NULL, ",");
+        g = atoi(strtokIndex);
+
+        strtokIndex = strtok(NULL, ",");
+        b = atoi(strtokIndex);
+
+        setStripColor(r, g, b);
+    }
+}
+
+void signalReady()
+{
+    for (uint8_t i = 0; i <= TOTAL_PIXELS; i++)
+    {
+        strip.setPixelColor(i, 0, 255, 0);
+        strip.show();
+        delay(100);
+    }
+
+    for (uint8_t i = 0; i <= TOTAL_PIXELS; i++)
+    {
+        strip.setPixelColor(i, 0, 0, 0);
+        strip.show();
+    }
+    delay(100);
 }
 
 void setup()
@@ -151,70 +190,29 @@ void setup()
     Serial.println("created client server. setting callback");
     client.setCallback(handleMQTTMessage);
 
-    // * RGB LED
-    pinMode(RGB_R, OUTPUT);
-    pinMode(RGB_G, OUTPUT);
-    pinMode(RGB_B, OUTPUT);
-    digitalWrite(RGB_R, HIGH);
-    digitalWrite(RGB_G, HIGH);
-    digitalWrite(RGB_B, HIGH);
+    strip.begin();
+    signalReady();
 }
 
 int value = 0;
 
 void loop()
 {
-    // setRGBLED(255, 255, 255);
-    // delay(2000);
-    setRGBLED(red);
-    delay(2000);
-    setRGBLED(green);
-    delay(2000);
-    setRGBLED(blue);
-    delay(2000);
-    setRGBLED();
-    delay(2000);
-    return;
+    // Serial.println("top of loop");
 
-    // if (!client.connected())
-    // {
-    //     connectToMqtt();
-    // }
-    // client.loop();
-}
-
-void setRGBLED(Color color)
-{
-    switch (color)
+    if (!client.connected())
     {
-    case red:
-        digitalWrite(RGB_R, LOW);
-        digitalWrite(RGB_G, HIGH);
-        digitalWrite(RGB_B, HIGH);
-        break;
-    case green:
-        digitalWrite(RGB_R, HIGH);
-        digitalWrite(RGB_G, LOW);
-        digitalWrite(RGB_B, HIGH);
-        break;
-    case blue:
-        digitalWrite(RGB_R, HIGH);
-        digitalWrite(RGB_G, HIGH);
-        digitalWrite(RGB_B, LOW);
-        break;
+        Serial.println("try MQTT connect");
+        connectToMqtt();
     }
+    client.loop();
 }
 
-void setRGBLED(uint8_t r, uint8_t g, uint8_t b)
+void setStripColor(uint8_t r, uint8_t g, uint8_t b)
 {
-    digitalWrite(RGB_R, LOW);
-    digitalWrite(RGB_G, LOW);
-    digitalWrite(RGB_B, LOW);
-}
-
-void setRGBLED()
-{
-    digitalWrite(RGB_R, HIGH);
-    digitalWrite(RGB_G, HIGH);
-    digitalWrite(RGB_B, HIGH);
+    for (uint8_t i = 0; i <= TOTAL_PIXELS; i++)
+    {
+        strip.setPixelColor(i, r, g, b);
+    }
+    strip.show();
 }

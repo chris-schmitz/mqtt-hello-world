@@ -1,24 +1,24 @@
 import Vue from "nativescript-vue"
 import Vuex from "vuex"
-import moment from 'moment'
+import moment from "moment"
 
 import io from "socket.io-client/dist/socket.io.js"
 
 Vue.use(Vuex)
 
 const SOCKET_CLIENT_STATES = {
-    UNCONFIGURED: 'unconfigured',
-    CONFIGURED: 'configured',
-    CONNECTED: 'connected'
+    UNCONFIGURED: "unconfigured",
+    CONFIGURED: "configured",
+    CONNECTED: "connected"
 }
 
-export {SOCKET_CLIENT_STATES}
-
+export { SOCKET_CLIENT_STATES }
 
 const state = {
-    host: "10.10.11.185",
+    host: "192.168.1.8",
+    // host: "10.10.11.185",
     port: 3001,
-    activeTabIndex: 0,
+    activeTabIndex: 2,
     socketioClient: null,
     serverResponse: null
 }
@@ -46,7 +46,7 @@ const actions = {
         if (!state.host && !state.port) {
             console.log("Cannot initialize socket io yet.")
             console.log("We don't have all of the configurations:")
-            console.log({host: state.host, port: state.port})
+            console.log({ host: state.host, port: state.port })
             return
         }
 
@@ -62,10 +62,10 @@ const actions = {
         })
 
         client.on("response", data => {
-            const stamped = moment().format('hh:mm:ss') + ": " + data
+            const stamped = moment().format("hh:mm:ss") + ": " + data
             const newResponse = state.serverResponse + "\n" + stamped
             console.log(newResponse)
-            commit('setServerResponse', newResponse)
+            commit("setServerResponse", newResponse)
         })
 
         commit("setSocketioClient", client)
@@ -81,11 +81,11 @@ const getters = {
     },
 
     socketioClientState(state, getters) {
-        if(getters.fullServerAddress && state.socketioClient) {
+        if (getters.fullServerAddress && state.socketioClient) {
             return SOCKET_CLIENT_STATES.CONNECTED
         }
 
-        if(getters.fullServerAddress && !state.socketioClient) {
+        if (getters.fullServerAddress && !state.socketioClient) {
             return SOCKET_CLIENT_STATES.CONFIGURED
         }
 
