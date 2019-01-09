@@ -38,12 +38,10 @@ const mutations = {
     setHost(state, value) {
         state.host = value
         ApplicationSettings.setString("host", value)
-        console.log(ApplicationSettings.getString("host"))
     },
     setPort(state, value) {
         state.port = value
         ApplicationSettings.setString("port", value)
-        console.log(ApplicationSettings.getString("port"))
     },
     setActiveTabIndex(state, value) {
         state.activeTabIndex = value
@@ -78,7 +76,6 @@ const actions = {
         client.on("response", data => {
             const stamped = moment().format("hh:mm:ss") + ": " + data
             const newResponse = state.serverResponse + "\n" + stamped
-            console.log(newResponse)
             commit("setServerResponse", newResponse)
         })
 

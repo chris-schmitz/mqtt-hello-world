@@ -5,23 +5,24 @@
     justifyContent="flex-start"
     alignItems="center"
   >
-    <Label class="swatch" :style="swatchColor" flexGrow="3"/>
-    <!-- <StackLayout orientation="horizontal" flexGrow="1">
+    <Label class="swatch" :style="backgroundColor" flexGrow="3"/>
+
+    <StackLayout orientation="horizontal" flexGrow="1">
       <Label class="selected-color">
         <FormattedString>
           <Span class="label" text="The selected color is: "/>
           <Span class="value" :style="valueColor" :text="selectedColor.hex"/>
         </FormattedString>
       </Label>
-    </StackLayout>-->
-    <!-- <StackLayout orientation="horizontal" flexGrow="1">
+    </StackLayout>
+    <StackLayout orientation="horizontal" flexGrow="1">
       <Label class="selected-color">
         <FormattedString>
           <Span class="label" text="The active LED is: "/>
           <Span class="value" :style="valueColor" :text="activeLed"/>
         </FormattedString>
       </Label>
-    </StackLayout>-->
+    </StackLayout>
     <Label flexGrow="1"/>
     <Button text="Show RGB Picker" @tap="showColorPicker" class="button"/>
     <Label text="Set color for LED:"/>
@@ -65,10 +66,17 @@ export default {
       return {
         color: this.selectedColor ? this.selectedColor.hex : ""
       };
+    },
+    backgroundColor() {
+      return {
+        background: this.selectedColor ? this.selectedColor.hex : ""
+      };
     }
   },
   methods: {
     setActiveLed(identifier) {
+      console.log("setActiveLed method fired");
+
       this.activeLed = identifier;
       this.selectedColor = this.ledStates[identifier - 1];
     },
@@ -82,6 +90,8 @@ export default {
         .then(result => {
           this.selectedColor = new Color(result);
           this.swatchColor = { background: this.selectedColor.hex };
+          this.ledStates[this.activeLed - 1] = this.selectedColor;
+
           this.client.emit("set-strip-color", {
             color: {
               r: this.selectedColor.r,
@@ -143,7 +153,7 @@ export default {
   .selected-color {
     .value {
       font-weight: bold;
-      font-size: 50px;
+      // font-size: 50px;
     }
   }
 
