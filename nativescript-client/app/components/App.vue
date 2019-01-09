@@ -9,15 +9,15 @@
       :selectedIndex="activeTabIndex"
       @selectedIndexChange="handleTabChange"
     >
-      <TabViewItem title="Control">
-        <Control/>
+      <TabViewItem title="Color Picker">
+        <Picker/>
       </TabViewItem>
       <TabViewItem title="Settings">
         <Settings/>
       </TabViewItem>
-      <TabViewItem title="Picker">
-        <Picker/>
-      </TabViewItem>
+      <!-- <TabViewItem title="Hello">
+        <Control/>
+      </TabViewItem>-->
     </TabView>
   </Page>
 </template>
@@ -28,6 +28,8 @@ import Settings from "./Settings";
 import Picker from "./Picker";
 import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
 import { SOCKET_CLIENT_STATES } from "../store/index";
+
+import * as ApplicationSettings from "application-settings";
 
 export default {
   components: {
@@ -43,17 +45,20 @@ export default {
     ...mapGetters(["socketioClientState"])
   },
   methods: {
-    ...mapMutations(["setActiveTabIndex"]),
+    ...mapMutations(["setActiveTabIndex", "load"]),
     ...mapActions(["initalizeSocketioClient"]),
     handleTabChange(newIndex) {
       this.setActiveTabIndex(newIndex);
     }
   },
   created() {
+    this.load();
+
     if (this.socketioClientState === SOCKET_CLIENT_STATES.CONFIGURED) {
       this.initalizeSocketioClient();
     }
-  }
+  },
+  mounted() {}
 };
 </script>
 

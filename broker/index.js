@@ -1,8 +1,28 @@
 const brokerSetup = require("./server-setups/setupBroker")
-const socketioSetup = require("./server-setups/setupSocketio")
+const socketioSetup = require("./server-setups/setupSocketioAndExpress")
 
-const io = socketioSetup()
+const { io, app } = socketioSetup()
 const server = brokerSetup()
+
+// | ============================================== * //
+// | Express setup for regular old rest requests
+app.get("/strip/colors", (request, response) => {
+    console.log("passing back strip colors")
+    response.json({
+        leds: [
+            { r: 255, g: 40, b: 255 },
+            { r: 255, g: 40, b: 255 },
+            { r: 255, g: 40, b: 255 },
+            { r: 255, g: 40, b: 255 },
+            { r: 255, g: 40, b: 255 },
+            { r: 255, g: 40, b: 255 },
+            { r: 255, g: 40, b: 255 },
+            { r: 255, g: 40, b: 255 }
+        ]
+    })
+})
+
+// | ============================================== * //
 
 // * ============================================== * //
 // * Socket.io connections for nativescript app

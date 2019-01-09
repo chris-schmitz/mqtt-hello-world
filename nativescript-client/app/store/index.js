@@ -1,8 +1,10 @@
 import Vue from "nativescript-vue"
 import Vuex from "vuex"
 import moment from "moment"
-
-import io from "socket.io-client/dist/socket.io.js"
+import * as ApplicationSettings from "application-settings"
+import stringify from "json-stringify-safe"
+import SocketClient from "../tools/socket-client"
+let client = null
 
 Vue.use(Vuex)
 
@@ -15,20 +17,33 @@ const SOCKET_CLIENT_STATES = {
 export { SOCKET_CLIENT_STATES }
 
 const state = {
-    host: "192.168.1.8",
+    host: null,
     // host: "10.10.11.185",
-    port: 3001,
-    activeTabIndex: 2,
+    port: null,
+    // port: 3001,
+    activeTabIndex: 0,
     socketioClient: null,
     serverResponse: null
 }
 
 const mutations = {
+    load(state) {
+        if (ApplicationSettings.getString("host")) {
+            state.host = ApplicationSettings.getString("host")
+        }
+        if (ApplicationSettings.getString("port")) {
+            state.port = ApplicationSettings.getString("port")
+        }
+    },
     setHost(state, value) {
         state.host = value
+        ApplicationSettings.setString("host", value)
+        console.log(ApplicationSettings.getString("host"))
     },
     setPort(state, value) {
         state.port = value
+        ApplicationSettings.setString("port", value)
+        console.log(ApplicationSettings.getString("port"))
     },
     setActiveTabIndex(state, value) {
         state.activeTabIndex = value
@@ -50,8 +65,7 @@ const actions = {
             return
         }
 
-        const url = `http://${state.host}:${state.port}`
-        const client = io(url)
+        client = new SocketClient(state.host, state.port)
 
         client.on("connect", () => {
             console.log("connected to socket server")

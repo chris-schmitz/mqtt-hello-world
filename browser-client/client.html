@@ -6,7 +6,8 @@
         <h1>hi</h1>
         <button id="greetings-button">Say hi to feather</button>
         <script>
-            var client = mqtt.connect("http://localhost:3000")
+            var hostip = "10.10.11.92"
+            var client = mqtt.connect(`http://${hostip}:3000`)
 
             client.on("connect", () => {
                 console.log("connected to mqtt server")
