@@ -101,7 +101,15 @@ export default {
             });
           }
 
+          let activeLed = null;
+          if (this.activeLed !== "all") {
+            activeLed = this.activeLed - 1;
+          } else {
+            activeLed = "all";
+          }
+
           this.client.emit("set-strip-color", {
+            activeLed,
             color: {
               r: this.selectedColor.r,
               g: this.selectedColor.g,
@@ -121,6 +129,9 @@ export default {
         })
         .then(json => {
           this.setLedStates(json.leds);
+        })
+        .then(json => {
+          this.swatchColor = this.ledStates[this.setActiveLed - 1];
         })
         .catch(error => {
           console.error(error);

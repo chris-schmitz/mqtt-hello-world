@@ -46,7 +46,11 @@ io.on("connection", function(socket) {
     socket.on("set-strip-color", data => {
         console.log("setting strip color:")
         console.log(data.color)
-        setStripColor(data.color)
+        console.log(data.activeLed)
+        if (activeLed === "all") {
+            activeLed = -1
+        }
+        setStripColor(data.color, activeLed)
     })
 })
 // * ============================================== * //
@@ -128,10 +132,10 @@ function sendLedBlinkMessage() {
     })
 }
 
-function setStripColor(color) {
+function setStripColor(color, ledIndex) {
     const message = {
         topic: "/strip/setcolor/rgb",
-        payload: `${color.r},${color.g},${color.b}\n`,
+        payload: `${color.r},${color.g},${color.b},${ledIndex}\n`,
         qos: 0,
         retain: true
     }

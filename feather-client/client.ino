@@ -19,7 +19,9 @@
 const char *demoTopic = "/mqtt/demo";
 const char *testSubscriptionTopic = "/blink/led";
 const char *messageFromBroker = "/message";
-const char *stripColor = "/strip/setcolor/rgb";
+const char *stripColorSetTopic = "/strip/color/set/rgb";
+const char *stripColorGetTopic = "/strip/color/get";
+const char *stripColorPublishTopic = "/strip/color";
 
 // * hardware pin defs
 #define LED_PIN 0
@@ -31,6 +33,9 @@ const char *stripColor = "/strip/setcolor/rgb";
 WiFiClient wifi;
 PubSubClient client(wifi);
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(TOTAL_PIXELS, LED_STRIP_PIN, NEO_GRB + NEO_KHZ800);
+
+// * And define any remaining tools
+uint32_t pixelColors[TOTAL_PIXELS];
 
 void blinkLED()
 {
@@ -87,7 +92,8 @@ void connectToMqtt()
             client.subscribe(testSubscriptionTopic);
             client.subscribe(demoTopic);
             client.subscribe(messageFromBroker);
-            client.subscribe(stripColor);
+            client.subscribe(stripColorSetTopic);
+            client.subscribe(stripColorGetTopic);
         }
         else
         {
@@ -140,12 +146,13 @@ void handleMQTTMessage(char *topic, byte *payload, unsigned int length)
         blinkLED();
     }
 
-    if (strcmp(topic, stripColor) == 0)
+    if (strcmp(topic, stripColorSetTopic) == 0)
     {
         Serial.println("got set strip color message");
 
         char *strtokIndex;
         uint8_t r, g, b;
+        int8_t ledIndex;
 
         strtokIndex = strtok(command, ",");
         r = atoi(strtokIndex);
@@ -156,8 +163,35 @@ void handleMQTTMessage(char *topic, byte *payload, unsigned int length)
         strtokIndex = strtok(NULL, ",");
         b = atoi(strtokIndex);
 
-        setStripColor(r, g, b);
+        strtokIndex = strtok(NULL, ",");
+        ledIndex = atoi(strtokIndex);
+
+        if (ledIndex == -1)
+        {
+            setStripColor(r, g, b);
+        }
+        else
+        {
+            setPixelColor(r, g, b, ledIndex);
+        }
     }
+
+    if (strcmp(topic, stripColorGetTopic) == 0)
+    {
+        char *payload = "";
+        payload = intArrayToString(pixelColors, TOTAL_PIXELS, &payload);
+
+        client.publish(stripColorPublishTopic, payload);
+    }
+}
+
+char intArrayToString(uint32_t intArray[], int arraySize, *payload)
+{
+    for (int i = 0; i < arraySize; i++)
+    {
+        payload += itoa(intArray[i]);
+    }
+    return payload;
 }
 
 void signalReady()
@@ -212,7 +246,13 @@ void setStripColor(uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint8_t i = 0; i <= TOTAL_PIXELS; i++)
     {
-        strip.setPixelColor(i, r, g, b);
+        setPixelColor(i, r, g, b);
     }
     strip.show();
+}
+
+void setPixelColor(uint8_t index, uint8_t r, uint8_t g, uint8_t b)
+{
+    strip.setPixelColor(index, r, g, b);
+    pixelColors[index] = strip.getPixelColor(index); //? should we do it this way or just set the passed in rgb??
 }
