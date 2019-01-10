@@ -53,10 +53,10 @@ export default {
   data() {
     return {
       picker: null,
-      selectedColor: { hex: "#000000" },
+      selectedColor: new Color("black"),
       ledStates: [],
       activeLed: 1,
-      swatchColor: { background: "#000000" }
+      swatchColor: new Color("purple")
     };
   },
   computed: {
@@ -75,14 +75,16 @@ export default {
   },
   methods: {
     setActiveLed(identifier) {
-      console.log("setActiveLed method fired");
-
       this.activeLed = identifier;
-      this.selectedColor = this.ledStates[identifier - 1];
+      if (identifier !== "all") {
+        this.selectedColor = this.ledStates[identifier - 1];
+      } else {
+        this.selectedColor = this.ledStates[0];
+      }
     },
     showColorPicker() {
       let color = "#000000";
-      if (this.selectedColor.hasOwnProperty("hex")) {
+      if ("hex" in this.selectedColor) {
         color = this.selectedColor.hex;
       }
       this.picker
@@ -90,7 +92,14 @@ export default {
         .then(result => {
           this.selectedColor = new Color(result);
           this.swatchColor = { background: this.selectedColor.hex };
-          this.ledStates[this.activeLed - 1] = this.selectedColor;
+
+          if (this.activeLed !== "all") {
+            this.ledStates[this.activeLed - 1] = this.selectedColor;
+          } else {
+            this.ledStates = this.ledStates.map(ledColor => {
+              return this.selectedColor;
+            });
+          }
 
           this.client.emit("set-strip-color", {
             color: {
@@ -107,6 +116,7 @@ export default {
     getStripColors() {
       fetch(`${this.fullServerAddress}/strip/colors`)
         .then(response => {
+          console.log("got strip color info");
           return response.json();
         })
         .then(json => {
