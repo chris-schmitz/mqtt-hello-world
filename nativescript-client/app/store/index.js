@@ -4,6 +4,8 @@ import moment from "moment"
 import * as ApplicationSettings from "application-settings"
 import stringify from "json-stringify-safe"
 import SocketClient from "../tools/socket-client"
+import { devOverrides } from "../../config"
+
 let client = null
 
 Vue.use(Vuex)
@@ -37,11 +39,15 @@ const mutations = {
     },
     setHost(state, value) {
         state.host = value
-        ApplicationSettings.setString("host", value)
+        if (!devOverrides.enabled) {
+            ApplicationSettings.setString("host", value)
+        }
     },
     setPort(state, value) {
         state.port = value
-        ApplicationSettings.setString("port", value)
+        if (!devOverrides.enabled) {
+            ApplicationSettings.setString("port", value)
+        }
     },
     setActiveTabIndex(state, value) {
         state.activeTabIndex = value
@@ -105,5 +111,11 @@ const getters = {
 }
 
 const store = new Vuex.Store({ state, mutations, getters, actions })
+
+if (devOverrides.enabled === true) {
+    console.log("using dev defaults")
+    store.commit("setHost", devOverrides.socketServer.host)
+    store.commit("setPort", devOverrides.socketServer.port)
+}
 
 export default store
